@@ -34,7 +34,7 @@ plot(p_grid, posterior; legend=false)
 # misunderstand about the shape of the posterior distribution?
 
 @model function globetoss(n, w)
-    p ~ Uniform(0.5, 1.)
+    p cd .~ Uniform(0.5, 1.)
     w ~ Binomial(n, p)
     w, p
 end
@@ -63,10 +63,10 @@ hpd(chain; alpha=0.11)
 
 BiasedBinomial(n, p) = Binomial(n, 0.8p)
 
-@model function globetoss(n ,k)
+@model function globetoss(n, w)
     p ~ Uniform(0, 1)
-    k ~ BiasedBinomial(n, p)
-    k, p
+    w ~ BiasedBinomial(n, p)
+    w, p
 end
 
 n = 20
