@@ -1,4 +1,5 @@
 using Distributions
+using StatsPlots
 using Turing
 
 # 1. Suppose the globe tossing data (Chapter 2) had turned out to be
@@ -6,10 +7,10 @@ using Turing
 # grid approximation. Use the same flat prior as in the book.
 
 n = 15
-k = 4
+w = 4
 p_grid = range(0, 1, length=1000)
 prior = fill(1., size(p_grid))
-likelihood = [pdf(Binomial(n, p), k) for p in p_grid]
+likelihood = [pdf(Binomial(n, p), w) for p in p_grid]
 posterior = likelihood .* prior
 posterior /= sum(posterior)
 plot(p_grid, posterior; legend=false)
@@ -20,9 +21,9 @@ plot(p_grid, posterior; legend=false)
 # a majority of the Earth's surface is water.
 
 n = 6
-k = 4
+w = 4
 prior = [p < 0.5 ? 0. : 2. for p in p_grid]
-likelihood = [pdf(Binomial(n, p), k) for p in p_grid]
+likelihood = [pdf(Binomial(n, p), w) for p in p_grid]
 posterior = likelihood .* prior
 posterior /= sum(posterior)
 plot(p_grid, posterior; legend=false)
@@ -32,13 +33,13 @@ plot(p_grid, posterior; legend=false)
 # Why? If you had only the information in the interval, what might you
 # misunderstand about the shape of the posterior distribution?
 
-@model function globetoss(n, k)
+@model function globetoss(n, w)
     p ~ Uniform(0.5, 1.)
-    k ~ Binomial(n, p)
-    k, p
+    w ~ Binomial(n, p)
+    w, p
 end
 
-chain = sample(globetoss(n, k), MH(), 10000)
+chain = sample(globetoss(n, w), MH(), 10000)
 plot(chain)
 quantile(chain; q=[0.055, 0.945])
 hpd(chain; alpha=0.11)
@@ -69,7 +70,7 @@ BiasedBinomial(n, p) = Binomial(n, 0.8p)
 end
 
 n = 20
-k = rand(BiasedBinomial(n, 0.7))
+w = rand(BiasedBinomial(n, 0.7))
 
-chain = sample(globetoss(n, k), MH(), 10000)
+chain = sample(globetoss(n, w), MH(), 10000)
 plot(chain)
